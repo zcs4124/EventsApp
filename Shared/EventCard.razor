@@ -1,0 +1,72 @@
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using Models
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">@Event.Title</h5>
+        <h6 class="card-subtitle mb-2 text-muted">@Event.EventDate.ToString("MMMM dd, yyyy")</h6>
+        <p class="card-text">@Event.Location</p>
+        <p class="card-text">Attendees: @Event.Attendees</p>
+        <button class="btn btn-primary" @onclick="EditEvent">Edit</button>
+        <button class="btn btn-success" @onclick='AddToAttendence'>Attend</button>
+    </div>
+</div>
+
+@if (isEditing)
+{
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title">Edit Event</h5>
+            <EditForm Model="@Event" OnValidSubmit="SaveEvent">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-group">
+                    <label for="eventName">Event Name</label>
+                    <InputText id="eventName" class="form-control" @bind-Value="Event.Title" />
+                </div>
+                <div class="form-group">
+                    <label for="eventDate">Event Date</label>
+                    <InputDate id="eventDate" class="form-control" @bind-Value="Event.EventDate" />
+                </div>
+                <div class="form-group">
+                    <label for="eventLocation">Event Location</label>
+                    <InputText id="eventLocation" class="form-control" @bind-Value="Event.Location" />
+                </div>
+                <button type="submit" class="btn btn-success">Save</button>
+                <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public Event Event { get; set; } = new Event();
+
+    [Parameter]
+    public EventCallback<Event> OnEventUpdated { get; set; }
+
+    private bool isEditing = false;
+
+    private void EditEvent()
+    {
+        isEditing = true;
+    }
+
+    private async Task SaveEvent()
+    {
+        await OnEventUpdated.InvokeAsync(Event);
+        isEditing = false;
+    }
+
+    private void CancelEdit()
+    {
+        isEditing = false;
+    }
+    private void AddToAttendence()
+    {
+        Event.Attendees++;
+    }
+}

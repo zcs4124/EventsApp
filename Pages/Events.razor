@@ -1,0 +1,53 @@
+@page "/events"
+@using MyBlazorApp.Shared
+@using Models
+
+<PageTitle>Events</PageTitle>
+<h1>Events</h1>
+<button class="btn btn-primary mb-3" @onclick="AddNewEvent">Add New Event</button>
+
+<Virtualize Items="events" Context="eventItem">
+    <EventCard Event="eventItem" OnEventUpdated="UpdateEvent" />
+</Virtualize>
+
+@code {
+    private List<Event> events = new() 
+    {
+        new Event { 
+            Title = "Spring Festival", 
+            EventDate = new DateTime(2025, 4, 30), 
+            Location = "Central Park" 
+            },
+        new Event { 
+            Title = "Tech Conference", 
+            EventDate = new DateTime(2025, 5, 3), 
+            Location = "Convention Center" 
+            },
+        new Event { 
+            Title = "Jazz Night", 
+            EventDate = new DateTime(2025, 5, 20), 
+            Location = "Downtown Club" 
+            }
+    };
+
+    private void AddNewEvent()
+    {
+        events.Add(new Event
+        {
+            Title = "New Event",
+            EventDate = DateTime.Now,
+            Location = "New Location"
+        });
+    }
+
+    private Task UpdateEvent(Event updatedEvent)
+    {
+        var eventToUpdate = events.FirstOrDefault(e => e.Title == updatedEvent.Title);
+        if (eventToUpdate != null)
+        {
+            eventToUpdate.EventDate = updatedEvent.EventDate;
+            eventToUpdate.Location = updatedEvent.Location;
+        }
+        return Task.CompletedTask;
+    }
+}

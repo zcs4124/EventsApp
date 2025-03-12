@@ -1,0 +1,82 @@
+﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Forms
+@using System.ComponentModel.DataAnnotations
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+            @if (string.IsNullOrEmpty(userName))
+            {
+                <button class="btn btn-primary" @onclick="ShowSignInForm">Register</button>
+            }
+            else
+            {
+                <span class="ml-auto">Welcome, @userName!</span>
+            }
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@if (showSignInForm)
+{
+    <div class="modal" style="display:block;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Register</h5>
+                    <button type="button" class="close" @onclick="HideSignInForm">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="@signInModel" OnValidSubmit="HandleSignIn">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <InputText id="name" class="form-control" @bind-Value="signInModel.Name" />
+                            <ValidationMessage For="@(() => signInModel.Name)" />
+                        </div>
+                        <button type="submit" class="btn btn-primary">Sign In</button>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private string userName;
+    private bool showSignInForm = false;
+    private SignInModel signInModel = new SignInModel();
+
+    private void ShowSignInForm()
+    {
+        showSignInForm = true;
+    }
+
+    private void HideSignInForm()
+    {
+        showSignInForm = false;
+    }
+
+    private void HandleSignIn()
+    {
+        userName = signInModel.Name;
+        showSignInForm = false;
+    }
+
+    public class SignInModel
+    {
+        [Required(ErrorMessage = "Name is required")]
+        public string Name { get; set; } = string.Empty;
+    }
+}
